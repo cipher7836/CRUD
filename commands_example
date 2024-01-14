@@ -1,0 +1,103 @@
+import pyodbc
+
+# Define the connection string for Windows Authentication
+conn_str = 'DRIVER={SQL Server};SERVER=Ganon;DATABASE=BC;Trusted_Connection=yes;'
+
+# Function to create a booking
+def create_booking(ref, consumer, therapist, start, end, hours, location, miles, notes):
+    try:
+        # Connect to the database
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Execute the INSERT query
+        cursor.execute("INSERT INTO [dbo].[Booking$] ([ref], [consumer], [therapist], [start], [end], [hours], [location], [miles], [notes]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (ref, consumer, therapist, start, end, hours, location, miles, notes))
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Booking created successfully!")
+
+    except Exception as e:
+        print(f"Error creating booking: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
+
+# Function to read bookings
+def read_bookings():
+    try:
+        # Connect to the database
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Execute the SELECT query
+        cursor.execute("SELECT * FROM [dbo].[Booking$]")
+
+        # Fetch all rows
+        rows = cursor.fetchall()
+
+        # Display the bookings
+        for row in rows:
+            print(row)
+
+    except Exception as e:
+        print(f"Error reading bookings: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
+
+# Function to update a booking
+def update_booking(ref, new_miles):
+    try:
+        # Connect to the database
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Execute the UPDATE query
+        cursor.execute("UPDATE [dbo].[Booking$] SET [miles] = ? WHERE [ref] = ?", (new_miles, ref))
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Booking updated successfully!")
+
+    except Exception as e:
+        print(f"Error updating booking: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
+
+# Function to delete a booking
+def delete_booking(ref):
+    try:
+        # Connect to the database
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Execute the DELETE query
+        cursor.execute("DELETE FROM [dbo].[Booking$] WHERE [ref] = ?", (ref,))
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Booking deleted successfully!")
+
+    except Exception as e:
+        print(f"Error deleting booking: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
+
+# Example usage
+create_booking("12345", "Consumer A", "Therapist X", "2024-01-12 10:00:00", "2024-01-12 12:00:00", 2.0, "Location A", 50.0, "Some notes")
+read_bookings()
+update_booking("12345", 60.0)
+read_bookings()
+delete_booking("12345")
+read_bookings()
